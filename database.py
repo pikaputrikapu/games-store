@@ -4,14 +4,14 @@ import sqlite3
 DB_NAME = 'game_store.db'
 
 def get_connection() -> sqlite3.Connection:
-    """подключение к базе данных с нужными настройками"""
+    """Подключение к базе данных с нужными настройками"""
     conn = sqlite3.connect(DB_NAME)
     conn.execute("PRAGMA foreign_keys = ON;")
     conn.row_factory = sqlite3.Row
     return conn
 
 def get_all_games():
-    """получение всех игр из базы данных"""
+    """Получение всех игр"""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM games;")
@@ -20,7 +20,7 @@ def get_all_games():
     return games
 
 def get_all_customers():
-    """получение всех клиентов"""
+    """Получение всех пользователей"""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM customers;")
@@ -29,7 +29,7 @@ def get_all_customers():
     return customers
 
 def get_game_by_id(game_id):
-    """получение игры по id"""
+    """Получение игры по id"""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM games WHERE id = ?;", (game_id,))
@@ -38,7 +38,7 @@ def get_game_by_id(game_id):
     return game
 
 def get_customer_by_id(customer_id):
-    """Получение клиента по id"""
+    """Получение пользователя по id"""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM customers WHERE id = ?;", (customer_id,))
@@ -47,7 +47,7 @@ def get_customer_by_id(customer_id):
     return customer
 
 def count_customers():
-    """получение количества клиентов"""
+    """Получение количества пользователей"""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT COUNT(*) FROM customers")
@@ -56,7 +56,7 @@ def count_customers():
     return customers
 
 def count_games():
-    """получение количества игр"""
+    """Получение количества игр"""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT COUNT(*) FROM games")
@@ -74,10 +74,32 @@ def add_game(title, genre, price):
     return f"{title} {genre} {price}"
 
 def add_customer(name, age, email, phone):
-    """Добавляет клиента"""
+    """Добавляет пользователя"""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("INSERT INTO customers (name, age, email, phone) VALUES (?, ?, ?, ?)", (name, age, email, phone))
     conn.commit()
     conn.close()
     return f"{name} {age} {email} {phone}"
+
+def delete_game_by_id(game_id):
+    """Удаляет игру по id"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM games WHERE id = ?;",(game_id,))
+    deleted_game = cursor.fetchone()
+    cursor.execute("DELETE FROM games WHERE id = ?;",(game_id,))
+    conn.commit()
+    conn.close()
+    return deleted_game
+
+def delete_customer_by_id(customer_id):
+    """Удаляет пользователя"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM customers WHERE id = ?;",(customer_id,))
+    deleted_customer = cursor.fetchone()
+    cursor.execute("DELETE FROM customers WHERE id = ?;",(customer_id,))
+    conn.commit()
+    conn.close()
+    return deleted_customer

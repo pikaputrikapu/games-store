@@ -99,10 +99,9 @@ def init_db():
             "INSERT INTO purchases (customer_id, game_id, purchase_date, price) VALUES (?, ?, ?, ?);",
             (customers_id, game_id, date, price)
         )
-
-    print("Таблички были восстановленны/сброшенны")
-
     conn.commit()
     conn.close()
+
+    print("Таблички были сброшенны")
 
 init_db()
