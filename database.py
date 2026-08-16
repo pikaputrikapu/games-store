@@ -33,16 +33,34 @@ def get_game_by_id(game_id):
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM games WHERE id = ?;", (game_id,))
-    game = cursor.fetchone()
+    game_by_id = cursor.fetchone()
     conn.close()
     return game
+
+def get_game_by_title(game_title):
+    """Получение игры по title"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM games WHERE title = ?;", (game_title,))
+    game_by_title = cursor.fetchone()
+    conn.close()
+    return game_by_title
+
+def get_customer_by_name(customer_name):
+    """Получение пользователя по name"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM customers WHERE name = ?;", (customer_name,))
+    customer_by_name = cursor.fetchone()
+    cursor.close()
+    return customer_by_name
 
 def get_customer_by_id(customer_id):
     """Получение пользователя по id"""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM customers WHERE id = ?;", (customer_id,))
-    customer = cursor.fetchone()
+    customer_by_id = cursor.fetchone()
     conn.close()
     return customer
 
@@ -94,7 +112,7 @@ def delete_game_by_id(game_id):
     return deleted_game
 
 def delete_customer_by_id(customer_id):
-    """Удаляет пользователя"""
+    """Удаляет пользователя по id"""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM customers WHERE id = ?;",(customer_id,))
@@ -103,3 +121,4 @@ def delete_customer_by_id(customer_id):
     conn.commit()
     conn.close()
     return deleted_customer
+
