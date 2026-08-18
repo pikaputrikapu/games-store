@@ -10,115 +10,91 @@ def get_connection() -> sqlite3.Connection:
     conn.row_factory = sqlite3.Row
     return conn
 
-def get_all_games():
-    """Получение всех игр"""
+def execute_query(query, params=(), fetch=None):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM games;")
-    games = cursor.fetchall()
+    cursor.execute(query, params)
+    result = None
+    if fetch == 'one':
+        result = cursor.fetchone()
+    elif fetch == 'all':
+        result = cursor.fetchall()
+    conn.commit()
     conn.close()
-    return games
+    return result
+
+def get_all_games():
+    """Получение всех игр"""
+    return execute_query("SELECT * FROM games;", fetch='all')
 
 def get_all_customers():
     """Получение всех пользователей"""
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM customers;")
-    customers = cursor.fetchall()
-    conn.close
-    return customers
+    return execute_query("SELECT * FROM customers;", fetch='all')
 
 def get_game_by_id(game_id):
     """Получение игры по id"""
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM games WHERE id = ?;", (game_id,))
-    game_by_id = cursor.fetchone()
-    conn.close()
-    return game
+    return execute_query("SELECT * FROM games WHERE id = ?;", (game_id,), fetch='one')
 
 def get_game_by_title(game_title):
     """Получение игры по title"""
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM games WHERE title = ?;", (game_title,))
-    game_by_title = cursor.fetchone()
-    conn.close()
-    return game_by_title
+    return execute_query("SELECT * FROM games WHERE title = ?;", (game_title,), fetch='one')
 
 def get_customer_by_name(customer_name):
     """Получение пользователя по name"""
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM customers WHERE name = ?;", (customer_name,))
-    customer_by_name = cursor.fetchone()
-    cursor.close()
-    return customer_by_name
+    return execute_query("SELECT * FROM customers WHERE name = ?;", (customer_name,), fetch='one')
 
 def get_customer_by_id(customer_id):
     """Получение пользователя по id"""
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM customers WHERE id = ?;", (customer_id,))
-    customer_by_id = cursor.fetchone()
-    conn.close()
-    return customer
+    return execute_query("SELECT * FROM customers WHERE id = ?;", (customer_id,), fetch='one')
 
 def count_customers():
     """Получение количества пользователей"""
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT COUNT(*) FROM customers")
-    customers = cursor.fetchone()[0]
-    conn.close()
-    return customers
+    return execute_query("SELECT COUNT(*) FROM customers", fetch='one')[0]
 
 def count_games():
     """Получение количества игр"""
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT COUNT(*) FROM games")
-    games = cursor.fetchone()[0]
-    conn.close()
-    return games
+    return execute_query("SELECT COUNT(*) FROM games", fetch='one')[0]
 
 def add_game(title, genre, price):
     """Добавляет игру"""
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO games (title, genre, price) VALUES (?, ?, ?)",(title, genre, price))
-    conn.commit()
-    conn.close()
-    return f"{title} {genre} {price}"
+    execute_query("INSERT INTO games (title, genre, price) VALUES (?, ?, ?)", (title, genre, price), fetch='one')
+    added_game = f"{title}, {genre}, {price}"
+    return added_game
 
 def add_customer(name, age, email, phone):
     """Добавляет пользователя"""
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO customers (name, age, email, phone) VALUES (?, ?, ?, ?)", (name, age, email, phone))
-    conn.commit()
-    conn.close()
-    return f"{name} {age} {email} {phone}"
+    execute_query("INSERT INTO customers (name, age, email, phone) VALUES (?, ?, ?, ?)", (name, age, email, phone), fetch='one')
+    added_customer = f"{name}, {age}, {email}, {phone}"
+    return added_customer
 
 def delete_game_by_id(game_id):
     """Удаляет игру по id"""
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM games WHERE id = ?;",(game_id,))
-    deleted_game = cursor.fetchone()
-    cursor.execute("DELETE FROM games WHERE id = ?;",(game_id,))
-    conn.commit()
-    conn.close()
+    deleted_game = execute_query("SELECT * FROM games WHERE id = ?;", (game_id,), fetch='one')
+    execute_query("DELETE FROM games WHERE id = ?;", (game_id,), fetch='one')
     return deleted_game
 
 def delete_customer_by_id(customer_id):
     """Удаляет пользователя по id"""
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM customers WHERE id = ?;",(customer_id,))
-    deleted_customer = cursor.fetchone()
-    cursor.execute("DELETE FROM customers WHERE id = ?;",(customer_id,))
-    conn.commit()
-    conn.close()
+    deleted_customer = execute_query("SELECT * FROM customers WHERE id = ?;", (customer_id,), fetch='one')
+    execute_query("DELETE FROM customers WHERE id = ?;", (customer_id,))
     return deleted_customer
 
+def get_customer_purchases(customer_id):
+    """Получение покупок пользователя"""
+    return execute_query("""
+        SELECT purchases.id, games.title, purchases.purchase_date, purchases.price
+        FROM purchases
+        JOIN games ON purchases.game_id = games.id
+        WHERE purchases.customer_id = ?
+        ORDER BY purchases.purchase_date DESC;""",
+        (customer_id,), fetch='all')
+
+def get_game_buyers(game_id):
+    """Получение покупателей игры"""
+    return execute_query("""
+        SELECT customers.id, customers.name, customers.age, customers.email, customers.phone
+        FROM purchases
+        JOIN customers ON purchases.customer_id = customers.id
+        WHERE purchases.game_id = ?
+        ORDER BY purchases.purchase_date DESC;""",
+        (game_id,), fetch='all')
