@@ -98,3 +98,10 @@ def get_game_buyers(game_id):
         WHERE purchases.game_id = ?
         ORDER BY purchases.purchase_date DESC;""",
         (game_id,), fetch='all')
+
+def add_purchase(customer_id, game_id, purchase_date, price):
+    execute_query("""
+    INSERT INTO purchases (customer_id, game_id, purchase_date, price) 
+    VALUES (?,?,?,?);
+    """,(customer_id, game_id, purchase_date, price,))
+    return f"{customer_id}, {game_id}, {purchase_date}, {price}"
