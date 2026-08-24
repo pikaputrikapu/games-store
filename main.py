@@ -1,85 +1,82 @@
-import database
-
-# #Get all games
-# print("=== GAMES ===")
-# games = database.get_all_games()
-# for game in games:
-#     print (f"{game['id']}, {game['title']}, {game['genre']}, {game['price']}")
+import sys
+from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QPushButton, QTableWidget, QTableWidgetItem, QLineEdit, QHBoxLayout, QMessageBox, QAbstractItemView
+from database import get_all_games, add_game, delete_game_by_id
 
 
-# #Get all customers
-# print("=== CUSTOMERS ===")
-# customers = database.get_all_customers()
-# for customer in customers:
-#     print(f"{customer['id']}, {customer['name']}, {customer['age']}, {customer['email']}, {customer['phone']}")
+class MainWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Game Store")
+        self.resize(800, 600)
+        self.lable = QLabel("Магазин игр", self)
+        self.title_input = QLineEdit()
+        self.title_input.setPlaceholderText("Название игры")
+        self.genre_input = QLineEdit()
+        self.genre_input.setPlaceholderText("Жанр игры")
+        self.price_input = QLineEdit()
+        self.price_input.setPlaceholderText("Цена игры")
+        self.add_button = QPushButton("Добавить игру", self)
+        self.add_button.clicked.connect(self.add_new_game)
 
-# #Get game by id
-# print("=== GAME BY ID ===")
-# game_id = database.get_game_by_id(1)
-# if game_id: print(f"{game_id['id']}, {game_id['title']}, {game_id['genre']}, {game_id['price']}")
-# else: print("игра не найдена")
+        input_layout = QHBoxLayout()
+        input_layout.addWidget(self.title_input)
+        input_layout.addWidget(self.genre_input)
+        input_layout.addWidget(self.price_input)
+        input_layout.addWidget(self.add_button)
 
-# #Get customer by id
-# print("=== CUSTOMER BY ID ===")
-# customer_id = database.get_customer_by_id(1)
-# if customer_id: print(f"{customer_id['id']},{customer_id['name']},{customer_id['age']},{customer_id['email']},{customer_id['phone']}")
-# else: print("Клиент не найден")
+        self.game_table = QTableWidget()
+        self.game_table.setColumnCount(4)
+        self.game_table.setHorizontalHeaderLabels(["ID", "Название", "Жанр", "Цена"])
+        self.game_table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        
+        layout = QVBoxLayout()
+        layout.addWidget(self.lable)
+        layout.addLayout(input_layout)
+        layout.addWidget(self.game_table)
+        self.setLayout(layout)
+        self.refresh_button = QPushButton("Обновить", self)
+        self.refresh_button.clicked.connect(self.refresh_games)
+        layout.addWidget(self.refresh_button)
+        self.refresh_games()
+        
 
-# #Get customers count
-# print("=== CUSTOMERS COUNT ===")
-# customers_count = database.count_customers()
-# print(customers_count) 
+    def refresh_games(self):
+        games = get_all_games()
+        self.game_table.setRowCount(len(games))
+        for row, game in enumerate(games):
+            self.game_table.setItem(row, 0, QTableWidgetItem(str(game["id"])))
+            self.game_table.setItem(row, 1, QTableWidgetItem(game["title"]))
+            self.game_table.setItem(row, 2, QTableWidgetItem(game["genre"]))
+            self.game_table.setItem(row, 3, QTableWidgetItem(str(game["price"])))
+    
+    def add_new_game(self):
+        title = self.title_input.text().strip()
+        genre = self.genre_input.text().strip()
+        price_text = self.price_input.text().strip()
 
-# #Get games count
-# print("=== GAMES COUNT ===")
-# games_count = database.count_games()
-# print(games_count)
+        if not title or not genre or not price_text:
+            QMessageBox.warning(self, "Ошибка", "Пожалуйста, заполниет все поля")
+            return
+        try:
+            price = float(price_text)
+        except ValueError:
+            QMessageBox.warning(self, "Ошибка", "Цена должна быть числом")
+            return
 
-# #Add game
-# print("=== ADDED GAME ===")
-# added_game = database.add_game("test_title", "test_genre", 20)
-# print(added_game)
+        if price < 0:
+            QMessageBox.warning(self, "Ошибка", "Цена не может быть отрицательной")
+            return
 
-# #Add customer
-# print("=== ADDED CUSTOMER ===")
-# added_customer = database.add_customer("test_name", 20, "test_email", +75937247403)
-# print(added_customer)
+        add_game(title, genre, price_text)
+        QMessageBox.information(self, "Успех", f"Игра {title} добавлена")
+        self.title_input.clear()
+        self.genre_input.clear()
+        self.price_input.clear()
+        self.refresh_games()
 
-# #Delete game by id
-# print("=== DELETED GAME ===")
-# deleted_game = database.delete_game_by_id(1)
-# if deleted_game: print(f"{deleted_game["id"]}, {deleted_game["title"]}, {deleted_game["genre"]}, {deleted_game["price"]}")
-# else: print("Игра не найдена")
+app = QApplication(sys.argv)
 
-# #Delete customer by id
-# print("=== DELETED CUSTOMER ===")
-# deleted_customer = database.delete_customer_by_id(1)
-# if deleted_customer: print(f"{deleted_customer["id"]}, {deleted_customer["name"]}, {deleted_customer["email"]}, {deleted_customer["phone"]}")
-# else: print("Пользователь не найден")
+window = MainWindow()
+window.show()
 
-# #Get game by title
-# print("=== GAME BY TITLE ===")
-# game_by_title = database.get_game_by_title("Baba Is You")
-# print(f"{game_by_title['id']},{game_by_title['title']},{game_by_title['genre']},{game_by_title['price']}")
-
-# #Get customer by name
-# print("=== CUSTOMER BY NAME ===")
-# customer_by_name = database.get_customer_by_name("Alex")
-# print(f"{customer_by_name['id']},{customer_by_name['name']},{customer_by_name['email']},{customer_by_name['phone']}")
-
-# customer_id = 9
-# print(f"=== GAMES OF THE CUSTOMER WITH ID {customer_id} ===")
-# purchases = database.get_customer_purchases(customer_id)
-# if purchases:
-#     for purchase in purchases: print(f"{purchase['id']}, {purchase['title']}, {purchase['purchase_date']}, {purchase['price']}")
-# else: print("Покупки не найдены.") 
-
-# game_id = 6
-# print(f"=== BUYERS GAME WITH ID {game_id} ===")
-# buyers = database.get_game_buyers(game_id)
-# if buyers:
-#     for buyer in buyers: print(f"{buyer['id']}, {buyer['name']}, {buyer['email']}, {buyer['phone']}")
-# else: print("Покупатели не найдены.")
-
-added_purchase = database.add_purchase(1,1,"2026-08-18",10)
-print(added_purchase)
+sys.exit(app.exec())

@@ -19,7 +19,8 @@ def init_db():
         name TEXT NOT NULL,
         age INTEGER NOT NULL,
         email TEXT NOT NULL UNIQUE,
-        phone TEXT
+        phone TEXT,
+        coins INTEGER
         );
 
     CREATE TABLE games (
@@ -81,13 +82,14 @@ def init_db():
     customers = []
     for name in names:
         age = random.randint(12, 80)
+        coins = random.randint(10, 200)
         email = f"{name.lower()}@yandex.ru"
         phone = f"+7{random.randint(1000000000, 9999999999)}"
-        customers.append((name, age, email, phone))
+        customers.append((name, age, email, phone, coins))
 
     
 
-    cursor.executemany("INSERT INTO customers (name, age, email, phone) VALUES (?, ?, ?, ?);", customers)
+    cursor.executemany("INSERT INTO customers (name, age, email, phone, coins) VALUES (?, ?, ?, ?, ?);", customers)
     cursor.executemany("INSERT INTO games (title, genre, price) VALUES (?, ?, ?);", games)
 
     for _ in range(30):
