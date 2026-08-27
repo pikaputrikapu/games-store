@@ -141,3 +141,13 @@ def delete_purchase(purchase_id):
     deleted_purchase = execute_query("SELECT * FROM purchases WHERE id = ?;", (purchase_id,), fetch='one')
     execute_query("DELETE FROM purchases WHERE id = ?;", (purchase_id,))
     return deleted_purchase
+
+def update_game(game_id, title, genre, price):
+    """изменение данных игры"""
+    execute_query(
+        """
+        UPDATE games
+        SET title = ?, genre = ?, price = ?
+        WHERE id = ?;""",
+        (title, genre, price, game_id)
+    )

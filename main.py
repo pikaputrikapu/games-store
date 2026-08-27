@@ -1,6 +1,6 @@
 import sys
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QPushButton, QTableWidget, QTableWidgetItem, QLineEdit, QHBoxLayout, QMessageBox, QAbstractItemView
-from database import get_all_games, add_game, delete_game_by_id
+from database import get_all_games, add_game, delete_game_by_id, update_game
 
 
 class MainWindow(QWidget):
@@ -28,15 +28,25 @@ class MainWindow(QWidget):
         self.game_table.setColumnCount(4)
         self.game_table.setHorizontalHeaderLabels(["ID", "Название", "Жанр", "Цена"])
         self.game_table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.game_table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self.game_table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+
+        self.delete_button = QPushButton("Удалить игру", self)
+        self.delete_button.clicked.connect(self.delete_selected_game)
+        self.refresh_button = QPushButton("Обновить", self)
+        self.refresh_button.clicked.connect(self.refresh_games)
+        self.update_button = QPushButton("Редактировать игру", self)
+        self.update_button.clicked(self.update_selected_game)
         
         layout = QVBoxLayout()
         layout.addWidget(self.lable)
         layout.addLayout(input_layout)
         layout.addWidget(self.game_table)
-        self.setLayout(layout)
-        self.refresh_button = QPushButton("Обновить", self)
-        self.refresh_button.clicked.connect(self.refresh_games)
+        layout.addWidget(self.delete_button)
+        layout.addWidget(self.upda)
         layout.addWidget(self.refresh_button)
+
+        self.setLayout(layout)
         self.refresh_games()
         
 
@@ -73,6 +83,42 @@ class MainWindow(QWidget):
         self.genre_input.clear()
         self.price_input.clear()
         self.refresh_games()
+
+    def delete_selected_game(self):
+        selected_row = self.game_table.currentRow()
+
+        if selected_row == -1:
+            QMessageBox.warning(self,
+            "Ошибка","Выберите игру для удаления.")
+            return
+        
+        id_item = self.game_table.item(selected_row, 0)
+        title_item = self.game_table.item(selected_row, 1)
+        game_id = int(id_item.text())
+        game_title = title_item.text()
+        answer = QMessageBox.question(self,
+            "Подтверждение удаления",
+            f"Вы уверены, что хотите удалить игру '{game_title}'?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        if answer == QMessageBox.StandardButton.Yes:
+            delete_game_by_id(game_id)
+            QMessageBox.information(self, "Успех", f"Игра '{game_title}' удалена.")
+            self.refresh_games()
+
+    def update_selected_game(self):
+        selected_row = self.game_table.currentRow()
+        if selected_row == -1:
+            QMessageBox.warning(self,
+            "Ошибка", "Пожалуйста, выберите игру для редактирования.")
+            return
+        id_item = self.game_table.item(selected_row, 0)
+        title_item = self.game_table.item(selected_row, 1)
+        genre_item = self.game_table.item(selected_row, 2)
+        price_item = self.game_table.item(selected_row, 3)
+        
+
+
+
 
 app = QApplication(sys.argv)
 
