@@ -1,3 +1,4 @@
+from pathlib import Path
 from PyQt6.QtWidgets import (QWidget, QLabel, QVBoxLayout, QPushButton,
 QTableWidget, QTableWidgetItem, QLineEdit, QHBoxLayout, QMessageBox, QAbstractItemView)
 from database import get_all_games, add_game, delete_game_by_id, update_game
@@ -9,25 +10,28 @@ class GamesWidget(QWidget):
         super().__init__()
         self.setWindowTitle("Game Store")
         self.resize(800, 600)
+
+        self.create_widgets()
+        self.setup_layout()
+        self.connect_signals()
+        self.setup_style()
+
+        self.refresh_games()
+
+    def create_widgets(self):
         self.lable = QLabel("Магазин игр", self)
+
         self.title_input = QLineEdit()
         self.title_input.setPlaceholderText("Название игры")
         self.genre_input = QLineEdit()
         self.genre_input.setPlaceholderText("Жанр игры")
         self.price_input = QLineEdit()
         self.price_input.setPlaceholderText("Цена игры")
-        self.add_button = QPushButton("Добавить игру", self)
-        self.add_button.clicked.connect(self.add_new_game)
 
-        input_layout = QHBoxLayout()
-        input_layout.addWidget(self.title_input)
-        input_layout.addWidget(self.genre_input)
-        input_layout.addWidget(self.price_input)
-        input_layout.addWidget(self.add_button)
+        self.add_button = QPushButton("Добавить игру", self)
 
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("Поиск по названию")
-        self.search_input.textChanged.connect(self.search_games)
 
         self.game_table = QTableWidget()
         self.game_table.setColumnCount(4)
@@ -37,12 +41,18 @@ class GamesWidget(QWidget):
         self.game_table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
 
         self.delete_button = QPushButton("Удалить игру", self)
-        self.delete_button.clicked.connect(self.delete_selected_game)
+
         self.refresh_button = QPushButton("Обновить", self)
-        self.refresh_button.clicked.connect(self.refresh_games)
+
         self.update_button = QPushButton("Редактировать игру", self)
-        self.update_button.clicked.connect(self.update_selected_game)
-        
+
+    def setup_layout(self):
+        input_layout = QHBoxLayout()
+        input_layout.addWidget(self.title_input)
+        input_layout.addWidget(self.genre_input)
+        input_layout.addWidget(self.price_input)
+        input_layout.addWidget(self.add_button)
+
         layout = QVBoxLayout()
         layout.addWidget(self.lable)
         layout.addLayout(input_layout)
@@ -53,8 +63,13 @@ class GamesWidget(QWidget):
         layout.addWidget(self.refresh_button)
 
         self.setLayout(layout)
-        self.refresh_games()
-        
+
+    def connect_signals(self):
+        self.update_button.clicked.connect(self.update_selected_game)
+        self.refresh_button.clicked.connect(self.refresh_games)
+        self.delete_button.clicked.connect(self.delete_selected_game)
+        self.add_button.clicked.connect(self.add_new_game)
+        self.search_input.textChanged.connect(self.search_games)
 
     def refresh_games(self):
         games = get_all_games()
@@ -64,6 +79,7 @@ class GamesWidget(QWidget):
             self.game_table.setItem(row, 1, QTableWidgetItem(game["title"]))
             self.game_table.setItem(row, 2, QTableWidgetItem(game["genre"]))
             self.game_table.setItem(row, 3, QTableWidgetItem(str(game["price"])))
+        self.search_games()
     
     def add_new_game(self):
         title = self.title_input.text().strip()
@@ -159,3 +175,8 @@ class GamesWidget(QWidget):
                 self.game_table.setRowHidden(row, False)
             else:
                 self.game_table.setRowHidden(row, True)
+
+    def setup_style(self):
+        styles_path = Path(__file__).parent / "styles.qss"
+        styles = styles_path.read_text(encoding="utf-8")
+        self.setStyleSheet(styles)
