@@ -1,0 +1,226 @@
+/* ===================================================================
+   Пастельная тема Game Store (розовый / синий / зелёный / жёлтый)
+   Вдохновлено цветовой раскладкой вайрфрейм-макета
+   =================================================================== */
+
+* {
+    font-family: "Tahoma", "Segoe UI", sans-serif;
+    font-size: 12px;
+    color: #000000;
+}
+
+GamesWidget {
+    background-color: #FDF3F5;
+}
+
+/* -------------------------------------------------------------
+   Подписи
+   ------------------------------------------------------------- */
+QLabel {
+    background: transparent;
+    color: #000000;
+    font-size: 12px;
+    font-weight: normal;
+    border: none;
+    padding: 2px;
+}
+
+/* -------------------------------------------------------------
+   Заголовок ("Шапка") - розовый блок
+   ------------------------------------------------------------- */
+QLabel#titleLabel {
+    background-color: #F0B8B8;
+    color: #7A1F1F;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 8px 10px;
+    border: 2px solid #CC6666;
+    border-radius: 4px;
+}
+
+/* -------------------------------------------------------------
+   Поля ввода - голубые (как "Баннер" / "Картинка")
+   ------------------------------------------------------------- */
+QLineEdit {
+    background-color: #FFFFFF;
+    color: #000000;
+    border: 2px solid #6699CC;
+    border-radius: 3px;
+    padding: 4px 6px;
+    selection-background-color: #AEC6EB;
+    selection-color: #000000;
+}
+
+QLineEdit:focus {
+    border: 2px solid #3B6EA5;
+    background-color: #EAF2FB;
+}
+
+QLineEdit::placeholder {
+    color: #7F7F7F;
+}
+
+/* -------------------------------------------------------------
+   Кнопки - по умолчанию голубые
+   ------------------------------------------------------------- */
+QPushButton {
+    background-color: #AEC6EB;
+    color: #1F3A5F;
+    border: 2px solid #6699CC;
+    border-radius: 4px;
+    padding: 6px 16px;
+    min-height: 18px;
+    font-weight: bold;
+}
+
+QPushButton:hover {
+    background-color: #C7D9F2;
+}
+
+QPushButton:pressed {
+    background-color: #8FADDA;
+    border: 2px solid #3B6EA5;
+}
+
+QPushButton:disabled {
+    background-color: #ECECEC;
+    color: #A0A0A0;
+    border: 2px solid #C8C8C8;
+}
+
+/* Кнопка "Добавить игру" - зелёная (как "Опрос" / "Авторизация") */
+QPushButton#addButton {
+    background-color: #C8F0C0;
+    color: #1F5F2A;
+    border: 2px solid #66AA66;
+}
+QPushButton#addButton:hover {
+    background-color: #DAF7D4;
+}
+QPushButton#addButton:pressed {
+    background-color: #A6DE9C;
+    border: 2px solid #3F8A3F;
+}
+
+/* Кнопка "Удалить игру" - розовая/красная (как "Шапка" / "Верхнее меню") */
+QPushButton#deleteButton {
+    background-color: #F0B8B8;
+    color: #7A1F1F;
+    border: 2px solid #CC6666;
+}
+QPushButton#deleteButton:hover {
+    background-color: #F7D2D2;
+}
+QPushButton#deleteButton:pressed {
+    background-color: #E09A9A;
+    border: 2px solid #A64444;
+}
+
+/* Кнопка "Редактировать игру" - жёлтая (как блоки "Текст") */
+QPushButton#updateButton {
+    background-color: #FFF7A0;
+    color: #6B5900;
+    border: 2px solid #DAA520;
+}
+QPushButton#updateButton:hover {
+    background-color: #FFFBC2;
+}
+QPushButton#updateButton:pressed {
+    background-color: #F5E578;
+    border: 2px solid #B3860C;
+}
+
+/* Кнопка "Обновить" (refresh) - остаётся голубой по умолчанию,
+   но чуть отличается через objectName для акцента */
+QPushButton#refreshButton {
+    background-color: #AEC6EB;
+    color: #1F3A5F;
+    border: 2px solid #6699CC;
+}
+
+/* -------------------------------------------------------------
+   Таблица игр
+   ------------------------------------------------------------- */
+QTableWidget {
+    background-color: #F2F9FE;
+    alternate-background-color: #F2F9FE;
+    gridline-color: #D8D8D8;
+    color: #000000;
+    border: 2px solid #6699CC;
+    border-radius: 3px;
+    selection-background-color: #DCEBFB;
+    selection-color: #1F3A5F;
+}
+
+QTableWidget::item {
+    padding: 3px;
+}
+
+QTableWidget::item:selected {
+    background-color: #DCEBFB;
+    color: #1F3A5F;
+}
+
+QHeaderView::section {
+    background-color: #FFF7A0;
+    color: #6B5900;
+    border: 1px solid #DAA520;
+    padding: 5px;
+    font-weight: bold;
+}
+
+QHeaderView::section:hover {
+    background-color: #FFFBC2;
+}
+
+QTableCornerButton::section {
+    background-color: #FFF7A0;
+    border: 1px solid #DAA520;
+}
+
+/* -------------------------------------------------------------
+   Диалоги и сообщения
+   ------------------------------------------------------------- */
+QDialog {
+    background-color: #FDF3F5;
+}
+
+QMessageBox {
+    background-color: #FDF3F5;
+}
+
+/* -------------------------------------------------------------
+   Полосы прокрутки - зелёные
+   ------------------------------------------------------------- */
+QScrollBar:vertical {
+    background: #ECECEC;
+    width: 15px;
+    border: 1px solid #66AA66;
+}
+
+QScrollBar::handle:vertical {
+    background: #C8F0C0;
+    border: 1px solid #66AA66;
+    min-height: 24px;
+    border-radius: 2px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #A6DE9C;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    background: #ECECEC;
+    height: 0px;
+}
+
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: #ECECEC;
+}
+
+/* -------------------------------------------------------------
+   Диалог редактирования игры
+   ------------------------------------------------------------- */
+QDialogButtonBox QPushButton {
+    min-width: 70px;
+}
